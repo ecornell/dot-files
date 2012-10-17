@@ -1,0 +1,6 @@
+*~
+.DS_Store
+*.pyc
+content/blog/tags
+deploy
+.hyde_deps

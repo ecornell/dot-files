@@ -1,0 +1,23 @@
+[ui]
+username=Elijah Cornell <elijah.cornell@gmail.com>
+
+[extensions]
+fetch=
+gestalt=/Applications/TortoiseHg.app/Contents/Resources/kilnext/gestalt.py
+kilnauth=/Applications/TortoiseHg.app/Contents/Resources/kilnext/kilnauth.py
+kilnpath=/Applications/TortoiseHg.app/Contents/Resources/kilnext/kilnpath.py
+big-push=/Applications/TortoiseHg.app/Contents/Resources/kilnext/big-push.py
+#kiln=/Applications/TortoiseHg.app/Contents/Resources/kilnext/kiln.py
+caseguard=/Applications/TortoiseHg.app/Contents/Resources/kilnext/caseguard.py
+#kbfiles=/Applications/TortoiseHg.app/Contents/Resources/kilnext/bfiles/kbfiles
+
+[auth]
+kiln.prefix=8bitmage.kilnhg.com
+kiln.username=Elijah Cornell
+
+[tortoisehg]
+issue.regex=(?i)(?:(review|case|bug[zs]?\s*(id)?:?)s?\s*[#:; ]+)(([ ,:;#]*)(?P<bugid>\d+))
+issue.link=https://8bitmage.fogbugz.com/?{3}
+
+[kiln_scheme]
+kiln=https://8bitmage.kilnhg.com/Repo

@@ -7,3 +7,5 @@ colorscheme solarized
 if has("mouse")
   set mouse=a
 endif
+
+imap jj <esc>

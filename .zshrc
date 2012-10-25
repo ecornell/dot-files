@@ -17,4 +17,7 @@ export PATH=~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:$PATH
 . ~/.nvm/nvm.sh
 nvm use 0.8.12 > /dev/null
 
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+
 cd ~

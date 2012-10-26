@@ -18,6 +18,6 @@ export PATH=~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:$PATH
 nvm use 0.8.12 > /dev/null
 
 export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 cd ~

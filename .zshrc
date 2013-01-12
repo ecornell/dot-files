@@ -20,4 +20,6 @@ nvm use 0.8.12 > /dev/null
 export PATH="$HOME/.rbenv/bin:$PATH"
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
+. `brew --prefix`/etc/profile.d/z.sh
+
 cd ~

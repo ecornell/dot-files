@@ -2,14 +2,14 @@
 username=Elijah Cornell <elijah.cornell@gmail.com>
 
 [extensions]
-fetch=
-gestalt=/Applications/TortoiseHg.app/Contents/Resources/kilnext/gestalt.py
-kilnauth=/Applications/TortoiseHg.app/Contents/Resources/kilnext/kilnauth.py
-kilnpath=/Applications/TortoiseHg.app/Contents/Resources/kilnext/kilnpath.py
-big-push=/Applications/TortoiseHg.app/Contents/Resources/kilnext/big-push.py
-#kiln=/Applications/TortoiseHg.app/Contents/Resources/kilnext/kiln.py
-caseguard=/Applications/TortoiseHg.app/Contents/Resources/kilnext/caseguard.py
-#kbfiles=/Applications/TortoiseHg.app/Contents/Resources/kilnext/bfiles/kbfiles
+#fetch=
+#gestalt=/Users/eli/Downloads/TortoiseHg.app/Contents/Resources/kilnext/gestalt.py
+kilnauth=/Users/eli/Downloads/TortoiseHg.app/Contents/Resources/kilnext/kilnauth.py
+kilnpath=/Users/eli/Downloads/TortoiseHg.app/Contents/Resources/kilnext/kilnpath.py
+#big-push=/Users/eli/Downloads/TortoiseHg.app/Contents/Resources/kilnext/big-push.py
+#kiln=/Users/eli/Downloads/TortoiseHg.app/Contents/Resources/kilnext/kiln.py
+#caseguard=/Users/eli/Downloads/TortoiseHg.app/Contents/Resources/kilnext/caseguard.py
+#kbfiles=/Users/eli/Downloads/TortoiseHg.app/Contents/Resources/kilnext/bfiles/kbfiles
 
 [auth]
 kiln.prefix=8bitmage.kilnhg.com

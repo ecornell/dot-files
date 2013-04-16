@@ -12,6 +12,9 @@ plugins=(git rbenv)
 
 source $ZSH/oh-my-zsh.sh
 
+export CLICOLOR=1
+export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
+
 export PATH=~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:$PATH
 
 . ~/.nvm/nvm.sh
@@ -21,5 +24,9 @@ export PATH="$HOME/.rbenv/bin:$PATH"
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 . `brew --prefix`/etc/profile.d/z.sh
+
+
+
+alias ls='ls -GFh'
 
 cd ~

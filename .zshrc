@@ -3,8 +3,8 @@ ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="mage"
 
 # CASE_SENSITIVE="true"
-# DISABLE_AUTO_UPDATE="true"
 # DISABLE_LS_COLORS="true"
+DISABLE_AUTO_UPDATE="true"
 DISABLE_AUTO_TITLE="true"
 COMPLETION_WAITING_DOTS="true"
 
@@ -12,10 +12,11 @@ plugins=(git rbenv)
 
 source $ZSH/oh-my-zsh.sh
 
+export PATH=~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:$PATH
+
+# OSX ls colors
 export CLICOLOR=1
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
-
-export PATH=~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:$PATH
 
 # node
 . ~/.nvm/nvm.sh
@@ -31,7 +32,7 @@ if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 # todo.txt setup
 alias t='todo.sh'
 
-
+# alias
 alias ls='ls -GFh'
 
 cd ~

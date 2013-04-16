@@ -17,14 +17,19 @@ export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 export PATH=~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:$PATH
 
+# node
 . ~/.nvm/nvm.sh
 nvm use 0.8.12 > /dev/null
 
+# ruby
 export PATH="$HOME/.rbenv/bin:$PATH"
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
+# z - quick dir selection
 . `brew --prefix`/etc/profile.d/z.sh
 
+# todo.txt setup
+alias t='todo.sh'
 
 
 alias ls='ls -GFh'

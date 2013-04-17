@@ -1,0 +1,9 @@
+# OSX ls colors
+export CLICOLOR=1
+export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
+
+# z - quick dir selection
+. `brew --prefix`/etc/profile.d/z.sh
+
+# todo.txt setup
+alias t='todo.sh'

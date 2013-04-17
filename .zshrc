@@ -14,10 +14,6 @@ source $ZSH/oh-my-zsh.sh
 
 export PATH=~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:$PATH
 
-# OSX ls colors
-export CLICOLOR=1
-export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
-
 # node
 . ~/.nvm/nvm.sh
 nvm use 0.8.12 > /dev/null
@@ -26,13 +22,10 @@ nvm use 0.8.12 > /dev/null
 export PATH="$HOME/.rbenv/bin:$PATH"
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
-# z - quick dir selection
-. `brew --prefix`/etc/profile.d/z.sh
-
-# todo.txt setup
-alias t='todo.sh'
-
 # alias
-alias ls='ls -GFh'
+alias ls='ls -GFh' 
+
+# run OSX 
+if [ `uname` == "Darwin" ]; then source ~/.zshrc-osx; fi
 
 cd ~

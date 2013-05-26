@@ -9,6 +9,7 @@ if (typeof grid_width == 'undefined')
 api.settings().alertAnimates = false
 api.settings().alertDisappearDelay = 2
 
+# - Bindings
 
 bind "R", ["cmd", "alt", "ctrl"], -> reloadConfig()
 
@@ -19,12 +20,6 @@ bind "H", mash_shift, -> api.focusedWindow().focusWindowLeft()
 bind "L", mash_shift, -> api.focusedWindow().focusWindowRight()
 bind "K", mash_shift, -> api.focusedWindow().focusWindowUp()
 bind "J", mash_shift, -> api.focusedWindow().focusWindowDown()
-
-
-changeGridWidth = (n) ->
-  grid_width = n
-  alert "Grid is now " + grid_width + " tiles wide"
-
 
 
 # snap this window to grid
@@ -44,7 +39,6 @@ bind "M", mash, ->
   win = api.focusedWindow()
   screenRect = win.screen().frameWithoutDockOrMenu()
   win.setFrame screenRect
-
 
 # move left
 bind "H", mash, ->
@@ -98,18 +92,11 @@ bind "U", mash, ->
   r.size.height = 2
   moveToGridProps win, r
 
-# # throw to next screen
-# bind "N", mash, ->
-#   win = api.focusedWindow()
-#   moveToGridPropsOnScreen win, win.screen().nextScreen(), gridProps(win)
 
-# # throw to previous screen (come on, who ever has more than 2 screens?)
-# bind "P", mash, ->
-#   win = api.focusedWindow()
-#   moveToGridPropsOnScreen win, win.screen().previousScreen(), gridProps(win)
-
-
-# helper functions
+# ~~~  helper functions ~~~
+changeGridWidth = (n) ->
+  grid_width = n
+  alert "Grid is now " + grid_width + " tiles wide"
 
 gridProps = (win) ->
   winFrame = win.frame()
@@ -135,45 +122,6 @@ moveToGridPropsOnScreen = (win, screen, gridProps) ->
   newFrame = NSInsetRect(newFrame, 0, 0) # acts as a little margin between windows, to give shadows some breathing room
   newFrame = NSIntegralRect(newFrame)
   win.setFrame newFrame
-
-
-
-# api.settings().alertAnimates = false
-# api.settings().alertDisappearDelay = 3
-
-# require('~/.zephyros/api.coffee')
-
-
-# # throw to next screen
-# bind "N", mash, ->
-#     win = api.focusedWindow()
-#     screen = win.screen()
-#     win.shiftAnchorPoint(0, 0, screen.nextScreen())
-
-# bind "left", mash, ->
-#     api.focusedWindow().shiftAnchorPoint -1, 0
-
-# bind "right", mash, ->
-#     api.focusedWindow().shiftAnchorPoint 1, 0
-
-# bind "up", mash, ->
-#     api.focusedWindow().shiftAnchorPoint 0, -1
-
-# bind "down", mash, ->
-#     api.focusedWindow().shiftAnchorPoint 0, 1
-
-# bind "left", mini_mash, ->
-#     api.focusedWindow().scaleCardinal('west')
-
-# bind "right", mini_mash, ->
-#     api.focusedWindow().scaleCardinal('east')
-
-# bind "up", mini_mash, ->
-#     api.focusedWindow().scaleCardinal('north')
-
-# bind "down", mini_mash, ->
-#     api.focusedWindow().scaleCardinal('south')
-
 
 # -----------------------------------------------------------------------------
 

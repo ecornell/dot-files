@@ -1,7 +1,8 @@
 # treats the screen like a grid, and lets you move/resize windows along it
 
 mash = ["cmd", "alt", "ctrl"]
-mash_shift = ["cmd", "alt", "shift"]
+mash_shift = ["cmd", "alt", "ctrl", "shift"]
+ca_shift = ["cmd", "alt", "shift"]
 
 if (typeof grid_width == 'undefined')
   grid_width = 4
@@ -11,15 +12,15 @@ api.settings().alertDisappearDelay = 2
 
 # - Bindings
 
-bind "R", ["cmd", "alt", "ctrl"], -> reloadConfig()
+bind "R", mash, -> reloadConfig()
 
 bind "=", mash, -> changeGridWidth grid_width + 1
 bind "-", mash, -> changeGridWidth grid_width - 1
 
-bind "H", mash_shift, -> api.focusedWindow().focusWindowLeft()
-bind "L", mash_shift, -> api.focusedWindow().focusWindowRight()
-bind "K", mash_shift, -> api.focusedWindow().focusWindowUp()
-bind "J", mash_shift, -> api.focusedWindow().focusWindowDown()
+bind "H", ca_shift, -> api.focusedWindow().focusWindowLeft()
+bind "L", ca_shift, -> api.focusedWindow().focusWindowRight()
+bind "K", ca_shift, -> api.focusedWindow().focusWindowUp()
+bind "J", ca_shift, -> api.focusedWindow().focusWindowDown()
 
 
 # snap this window to grid
@@ -54,20 +55,6 @@ bind "L", mash, ->
   r.origin.x = Math.min(r.origin.x + 1, grid_width - r.size.width)
   moveToGridProps win, r
 
-# grow to right
-bind "O", mash, ->
-  win = api.focusedWindow()
-  r = gridProps(win)
-  r.size.width = Math.min(r.size.width + 1, grid_width - r.origin.x)
-  moveToGridProps win, r
-
-# shrink from right
-bind "I", mash, ->
-  win = api.focusedWindow()
-  r = gridProps(win)
-  r.size.width = Math.max(r.size.width - 1, 1)
-  moveToGridProps win, r
-
 # move to upper row
 bind "K", mash, ->
   win = api.focusedWindow()
@@ -84,6 +71,20 @@ bind "J", mash, ->
   r.size.height = 1
   moveToGridProps win, r
 
+# nudge left
+bind "H", mash_shift, ->
+  win = api.focusedWindow()
+  tl = win.topLeft()
+  p = CGPointMake tl.x - 5, tl.y
+  win.setTopLeft p
+
+# nudge right
+bind "L", mash_shift, ->
+  win = api.focusedWindow()
+  tl = win.topLeft()
+  p = CGPointMake tl.x + 5, tl.y
+  win.setTopLeft p
+
 # fill whole vertical column
 bind "U", mash, ->
   win = api.focusedWindow()
@@ -91,6 +92,21 @@ bind "U", mash, ->
   r.origin.y = 0
   r.size.height = 2
   moveToGridProps win, r
+ 
+# grow to right
+bind "O", mash, ->
+  win = api.focusedWindow()
+  r = gridProps(win)
+  r.size.width = Math.min(r.size.width + 1, grid_width - r.origin.x)
+  moveToGridProps win, r
+
+# shrink from right
+bind "I", mash, ->
+  win = api.focusedWindow()
+  r = gridProps(win)
+  r.size.width = Math.max(r.size.width - 1, 1)
+  moveToGridProps win, r
+
 
 
 # ~~~  helper functions ~~~
@@ -101,11 +117,11 @@ changeGridWidth = (n) ->
 gridProps = (win) ->
   winFrame = win.frame()
   screenRect = win.screen().frameWithoutDockOrMenu()
-  thirdScrenWidth = screenRect.size.width / grid_width
+  gridWidth = screenRect.size.width / grid_width
   halfScreenHeight = screenRect.size.height / 2.0
-  CGRectMake Math.round((winFrame.origin.x - NSMinX(screenRect)) / thirdScrenWidth),
+  CGRectMake Math.round((winFrame.origin.x - NSMinX(screenRect)) / gridWidth),
              Math.round((winFrame.origin.y - NSMinY(screenRect)) / halfScreenHeight),
-             Math.max(Math.round(winFrame.size.width / thirdScrenWidth), 1),
+             Math.max(Math.round(winFrame.size.width / gridWidth), 1),
              Math.max(Math.round(winFrame.size.height / halfScreenHeight), 1)
 
 moveToGridProps = (win, gridProps) ->
@@ -113,11 +129,11 @@ moveToGridProps = (win, gridProps) ->
 
 moveToGridPropsOnScreen = (win, screen, gridProps) ->
   screenRect = screen.frameWithoutDockOrMenu()
-  thirdScrenWidth = screenRect.size.width / grid_width
+  gridWidth = screenRect.size.width / grid_width
   halfScreenHeight = screenRect.size.height / 2.0
-  newFrame = CGRectMake((gridProps.origin.x * thirdScrenWidth) + NSMinX(screenRect),
+  newFrame = CGRectMake((gridProps.origin.x * gridWidth) + NSMinX(screenRect),
                         (gridProps.origin.y * halfScreenHeight) + NSMinY(screenRect),
-                        gridProps.size.width * thirdScrenWidth,
+                        gridProps.size.width * gridWidth,
                         gridProps.size.height * halfScreenHeight)
   newFrame = NSInsetRect(newFrame, 0, 0) # acts as a little margin between windows, to give shadows some breathing room
   newFrame = NSIntegralRect(newFrame)

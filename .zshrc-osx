@@ -1,7 +1,6 @@
 # Fix Duplicate "Open With"
 alias fixow='/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -kill -r -domain local -domain user;killall Finder;echo "Open With has been rebuilt, Finder will relaunch"'
 
-
 # OSX ls colors
 export CLICOLOR=1
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
@@ -11,3 +10,7 @@ export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 # todo.txt setup
 alias t='todo.sh'
+
+# node
+. ~/.nvm/nvm.sh
+nvm use 0.8.12 > /dev/null

@@ -15,17 +15,18 @@ source $ZSH/oh-my-zsh.sh
 export PATH=~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:$PATH
 
 # node
-. ~/.nvm/nvm.sh
-nvm use 0.8.12 > /dev/null
+#. ~/.nvm/nvm.sh
+#nvm use 0.8.12 > /dev/null
 
 # ruby
 export PATH="$HOME/.rbenv/bin:$PATH"
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 # alias
-alias ls='ls -GFh' 
+alias ls='ls -GFh'
 
 # run OSX 
-if [ `uname` == "Darwin" ]; then source ~/.zshrc-osx; fi
+#if [ `uname` == "Darwin" ]; then source ~/.zshrc-osx; fi
+if [ `uname` "==" "Linux" ]; then source ~/.zshrc-linux; fi
 
 cd ~

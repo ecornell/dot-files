@@ -18,11 +18,11 @@ DISABLE_AUTO_UPDATE="true"
 DISABLE_AUTO_TITLE="true"
 COMPLETION_WAITING_DOTS="true"
 
-export PATH=~/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:$PATH
+export PATH=~/bin:/usr/local/bin:/usr/local/sbin:$PATH
 
 # ruby
-export PATH="$HOME/.rbenv/bin:$PATH"
-if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+#source /usr/local/opt/chruby/share/chruby/chruby.sh
+#source /usr/local/opt/chruby/share/chruby/auto.sh
 
 # alias
 alias ls='ls -GFh'
@@ -33,7 +33,7 @@ if [ `uname` "==" "Darwin" ]; then
     source ~/.zshrc-osx;
     antigen bundle brew
     antigen bundle brew-cask
-    antigen bendle osx
+    antigen bundle osx
 elif [ `uname` "==" "Linux" ]; then 
     source ~/.zshrc-linux; 
 fi

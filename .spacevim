@@ -10,18 +10,14 @@ function! Layers()
     Layer 'unite'
     Layer 'better-defaults'
 
-    "Layer 'airline'
+    "
+
     Layer 'lightline'
 
-    "Layer 'syntax-checking'
     Layer 'markdown'
     Layer 'html'
 
     Layer 'git'
-    Layer 'text-align'
-    "Layer 'programming'
-
-    Plug 'hecal3/vim-leader-guide'
 
 endfunction
 
@@ -36,19 +32,29 @@ function! UserInit()
     " Install private plugins
     " Plug 'extr0py/oni'
 
+    Plug 'dag/vim-fish'
+
 endfunction
 
 " Put your costom configurations here, e.g., change the colorscheme.
 function! UserConfig()
 
     " If you enable airline layer and have installed the powerline fonts, set it here.
-    let g:airline_powerline_fonts=1
+    " let g:airline_powerline_fonts=1
     " color desert
+
+    if &shell =~# 'fish$'
+        set shell=sh
+    endif
 
     if (has("termguicolors"))
         set termguicolors
         let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
         let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
     endif
+
+
+
+
 
 endfunction

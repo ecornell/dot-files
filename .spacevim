@@ -43,22 +43,62 @@ endfunction
 " Put your costom configurations here, e.g., change the colorscheme.
 function! UserConfig()
 
-    " If you enable airline layer and have installed the powerline fonts, set it here.
-    "let g:airline_powerline_fonts=1
-    "color seoul256-light
-    "color desert256v2
-    "color bubblegum-256-light
     color PaperColor
-
     set background=light
 
     if &shell =~# 'fish$'
         set shell=sh
     endif
 
+    " >>> LightLine config
     let g:lightline = {
         \ 'colorscheme': 'PaperColor_light',
+        \ 'active': {
+        \   'left': [ [ 'mode', 'paste' ],
+        \             [ 'fugitive', 'filename', 'modified' ] ]
+        \ },
+        \ 'component_function': {
+        \   'fugitive': 'LightlineFugitive',
+        \   'readonly': 'LightlineReadonly',
+        \   'modified': 'LightlineModified',
+        \   'filename': 'LightlineFilename'
+        \ },
+        \ 'separator': { 'left': '', 'right': '' },
+        \ 'subseparator': { 'left': '⦚', 'right': '⦚' }
         \ }
+
+    function! LightlineModified()
+        if &filetype == "help"
+            return ""
+        elseif &modified
+            return "+"
+        elseif &modifiable
+            return ""
+        else
+            return ""
+        endif
+    endfunction
+
+    function! LightlineReadonly()
+        if &filetype == "help"
+            return ""
+        elseif &readonly
+            return "🔒"
+        else
+            return ""
+        endif
+    endfunction
+
+    function! LightlineFugitive()
+        return exists('*fugitive#head') ? fugitive#head() : ''
+    endfunction
+
+    function! LightlineFilename()
+        return ('' != LightlineReadonly() ? LightlineReadonly() . ' ' : '') .
+            \ ('' != expand('%:t') ? expand('%:t') : '[No Name]') .
+            \ ('' != LightlineModified() ? ' ' . LightlineModified() : '')
+    endfunction
+    " <<< LightLine config
 
     if (has("termguicolors"))
         set termguicolors

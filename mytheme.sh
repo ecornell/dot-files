@@ -24,23 +24,23 @@ TMUX_POWERLINE_DEFAULT_RIGHTSIDE_SEPARATOR=${TMUX_POWERLINE_DEFAULT_RIGHTSIDE_SE
 if [ -z $TMUX_POWERLINE_LEFT_STATUS_SEGMENTS ]; then
 	TMUX_POWERLINE_LEFT_STATUS_SEGMENTS=(
 		#"tmux_session_info 148 234" \
-		"hostname 248 49" \
+		"hostname 245 49" \
 		#"ifstat 30 255" \
 		#"ifstat_sys 30 255" \
 		#"lan_ip 24 255 ${TMUX_POWERLINE_SEPARATOR_RIGHT_THIN}" \
 		#"wan_ip 24 255" \
-		"vcs_branch 249 49" \
-		"vcs_compare 250 49" \
-		"vcs_staged 251 49" \
-		"vcs_modified 252 49" \
-		"vcs_others 253 49" \
+		"vcs_branch 246 49" \
+		"vcs_compare 247 49" \
+		"vcs_staged 248 49" \
+		"vcs_modified 249 49" \
+		"vcs_others 250 49" \
 	)
 fi
 
 if [ -z $TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS ]; then
 	TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS=(
 		#"earthquake 3 0" \
-		"pwd 248 49" \
+		"pwd 245 49" \
 		#"macos_notification_count 29 255" \
 		#"mailcount 9 255" \
 		#"now_playing 234 37" \

@@ -36,6 +36,7 @@ cd ~/.dot-files
 - **Resizing**: Vim-style pane resizing (`H/J/K/L`)
 - **Splits**: `|` for horizontal, `_` for vertical
 - **Copy Mode**: Vim keybindings (`v` select, `y` yank)
+- **Clipboard**: OSC 52 support for copying to system clipboard (even over SSH)
 - **Mouse Support**: Enabled for clicking, scrolling, and resizing
 - **History**: 50k scrollback buffer
 - **Status Bar**: Clean, informative status line
@@ -45,6 +46,11 @@ cd ~/.dot-files
 - Comprehensive reference for all custom tmux keybindings
 - Accessible in tmux with `Prefix ?` (Ctrl+a then ?)
 - Organized by category: sessions, windows, panes, copy mode
+
+### Tmux Clipboard (tmux-clipboard)
+- OSC 52 clipboard integration script
+- Enables copying from tmux to system clipboard over SSH
+- Works with modern terminals that support OSC 52 (iTerm2, Windows Terminal, etc.)
 
 ### Git Ignore (.gitignore_global)
 - Global git ignore patterns
@@ -135,6 +141,7 @@ The `.bashrc` will automatically source this file if it exists.
 ├── .tmux.conf           # Tmux configuration
 ├── .gitignore_global    # Global git ignore patterns
 ├── tmux-cheatsheet.md   # Tmux keybinding reference
+├── tmux-clipboard       # OSC 52 clipboard integration script
 ├── install.sh           # Automated installation script
 ├── README.md            # This file
 ├── tmux-wrapper         # (Optional) PowerShell OSC filter for Windows Terminal

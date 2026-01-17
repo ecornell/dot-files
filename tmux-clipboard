@@ -1,0 +1,4 @@
+#!/bin/bash
+buf=$(cat)
+buf=$(echo -n "$buf" | base64 | tr -d '\n')
+printf "\033]52;c;%s\a" "$buf"

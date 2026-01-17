@@ -1,0 +1,19 @@
+#!/bin/bash
+# Tmux wrapper to filter PowerShell OSC sequences
+# This prevents issues when using tmux from Windows Terminal/PowerShell
+
+# Filter function to strip OSC sequences
+filter_osc() {
+    # Remove OSC sequences that PowerShell emits
+    # OSC sequences: ESC ] ... ESC \ or ESC ] ... BEL
+    sed -E 's/\x1b\][^\x1b]*(\x1b\\|\x07)//g'
+}
+
+# Check if we're being called to attach or if tmux is already running
+if [ "$TERM" = "screen-256color" ] || [ -n "$TMUX" ]; then
+    # Already in tmux, just run the command
+    exec /usr/bin/tmux "$@"
+else
+    # Starting new tmux session, apply filtering
+    exec /usr/bin/tmux "$@" 2>&1 | filter_osc
+fi

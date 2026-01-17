@@ -1,4 +1,16 @@
 #!/bin/bash
 buf=$(cat)
 buf=$(echo -n "$buf" | base64 | tr -d '\n')
-printf "\033]52;c;%s\a" "$buf"
+
+# ESC character
+ESC=$'\x1b'
+
+# Get the terminal device for the current tmux client
+tty_device=$(tmux display-message -p '#{client_tty}')
+
+# If inside tmux, use tmux passthrough escape sequence and write to the actual terminal
+if [ -n "$TMUX" ] && [ -n "$tty_device" ] && [ -w "$tty_device" ]; then
+    printf "${ESC}Ptmux;${ESC}${ESC}]52;c;%s\007${ESC}\\" "$buf" > "$tty_device"
+else
+    printf "${ESC}]52;c;%s\007" "$buf"
+fi

@@ -16,17 +16,17 @@ BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
 
 echo -e "${GREEN}Installing dotfiles from $DOTFILES_DIR${NC}"
 
-# List of files to symlink
-FILES=(
+# List of dotfiles to symlink to home directory
+DOTFILES=(
     ".bashrc"
     ".profile"
     ".tmux.conf"
-    ".zshrc"
     ".gitignore_global"
-    ".gvimrc.after"
-    ".hgignore_global"
-    ".hgrc"
-    ".todo.cfg"
+)
+
+# Additional files to symlink to home directory
+SUPPORT_FILES=(
+    "tmux-cheatsheet.md"
 )
 
 # Create backup directory if we need it
@@ -81,10 +81,42 @@ create_symlink() {
 
 # Install dotfiles
 echo ""
-echo "Creating symlinks..."
-for file in "${FILES[@]}"; do
+echo "Creating symlinks for dotfiles..."
+for file in "${DOTFILES[@]}"; do
     create_symlink "$file"
 done
+
+echo ""
+echo "Creating symlinks for support files..."
+for file in "${SUPPORT_FILES[@]}"; do
+    create_symlink "$file"
+done
+
+# Install tmux-wrapper to ~/.local/bin
+echo ""
+echo "Installing tmux-wrapper..."
+WRAPPER_SOURCE="$DOTFILES_DIR/tmux-wrapper"
+WRAPPER_TARGET="$HOME/.local/bin/tmux-wrapper"
+
+if [ ! -d "$HOME/.local/bin" ]; then
+    mkdir -p "$HOME/.local/bin"
+    echo -e "${YELLOW}  Created $HOME/.local/bin directory${NC}"
+fi
+
+if [ -L "$WRAPPER_TARGET" ] && [ "$(readlink "$WRAPPER_TARGET")" = "$WRAPPER_SOURCE" ]; then
+    echo -e "${GREEN}  ✓ tmux-wrapper already linked${NC}"
+elif [ -e "$WRAPPER_TARGET" ] && [ ! -L "$WRAPPER_TARGET" ]; then
+    backup_file ".local/bin/tmux-wrapper"
+    ln -s "$WRAPPER_SOURCE" "$WRAPPER_TARGET"
+    echo -e "${GREEN}  ✓ Linked tmux-wrapper${NC}"
+elif [ -L "$WRAPPER_TARGET" ]; then
+    rm "$WRAPPER_TARGET"
+    ln -s "$WRAPPER_SOURCE" "$WRAPPER_TARGET"
+    echo -e "${GREEN}  ✓ Linked tmux-wrapper${NC}"
+else
+    ln -s "$WRAPPER_SOURCE" "$WRAPPER_TARGET"
+    echo -e "${GREEN}  ✓ Linked tmux-wrapper${NC}"
+fi
 
 # Check for required dependencies
 echo ""
@@ -102,21 +134,20 @@ check_command "git"
 check_command "tmux"
 check_command "curl"
 
-# Check for chruby
-if [ -f "/usr/local/share/chruby/chruby.sh" ]; then
-    echo -e "${GREEN}  ✓ chruby installed${NC}"
-else
-    echo -e "${YELLOW}  ! chruby not found (optional for Ruby development)${NC}"
-fi
-
 echo ""
 echo -e "${GREEN}Installation complete!${NC}"
 echo ""
-echo "To apply bash changes, run:"
-echo "  source ~/.bashrc"
+echo "Next steps:"
+echo "  1. Apply bash changes:"
+echo "     source ~/.bashrc"
 echo ""
-echo "To apply tmux changes:"
-echo "  tmux source-file ~/.tmux.conf"
+echo "  2. Ensure ~/.local/bin is in your PATH (already configured in .bashrc)"
+echo ""
+echo "  3. Apply tmux changes (if tmux is running):"
+echo "     tmux source-file ~/.tmux.conf"
+echo ""
+echo "  4. View tmux cheatsheet anytime with:"
+echo "     Prefix ? (where Prefix is Ctrl+a)"
 echo ""
 
 if [ -d "$BACKUP_DIR" ]; then

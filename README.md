@@ -39,12 +39,7 @@ cd ~/.dot-files
 - **Mouse Support**: Enabled for clicking, scrolling, and resizing
 - **History**: 50k scrollback buffer
 - **Status Bar**: Clean, informative status line
-- **PowerShell Compatible**: Optimized escape-time for Windows Terminal
-
-### Tmux Wrapper (tmux-wrapper)
-- Filters PowerShell OSC sequences for Windows Terminal compatibility
-- Automatically used when tmux is invoked via the alias in `.bashrc`
-- Prevents terminal rendering issues on Windows systems
+- **Escape Time**: Optimized at 35ms for compatibility
 
 ### Tmux Cheatsheet (tmux-cheatsheet.md)
 - Comprehensive reference for all custom tmux keybindings
@@ -69,11 +64,6 @@ ln -s ~/.dot-files/.profile ~/.profile
 ln -s ~/.dot-files/.tmux.conf ~/.tmux.conf
 ln -s ~/.dot-files/.gitignore_global ~/.gitignore_global
 ln -s ~/.dot-files/tmux-cheatsheet.md ~/tmux-cheatsheet.md
-
-# Install tmux-wrapper
-mkdir -p ~/.local/bin
-ln -s ~/.dot-files/tmux-wrapper ~/.local/bin/tmux-wrapper
-chmod +x ~/.dot-files/tmux-wrapper
 
 # Apply changes
 source ~/.bashrc
@@ -144,10 +134,10 @@ The `.bashrc` will automatically source this file if it exists.
 ├── .profile             # Login shell configuration
 ├── .tmux.conf           # Tmux configuration
 ├── .gitignore_global    # Global git ignore patterns
-├── tmux-wrapper         # PowerShell OSC sequence filter
 ├── tmux-cheatsheet.md   # Tmux keybinding reference
 ├── install.sh           # Automated installation script
 ├── README.md            # This file
+├── tmux-wrapper         # (Optional) PowerShell OSC filter for Windows Terminal
 └── archived/            # Deprecated configs (zsh, vim, hg, etc.)
 ```
 

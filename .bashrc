@@ -19,9 +19,6 @@ shopt -s cmdhist                # Save multi-line commands as one command
 # Colors: green user@host, blue directory
 PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
-# Use wrapper to filter PowerShell OSC sequences
-alias tmux='tmux-wrapper'
-
 # Navigation aliases
 alias ..='cd ..'
 alias ...='cd ../..'

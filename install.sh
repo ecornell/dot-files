@@ -92,32 +92,6 @@ for file in "${SUPPORT_FILES[@]}"; do
     create_symlink "$file"
 done
 
-# Install tmux-wrapper to ~/.local/bin
-echo ""
-echo "Installing tmux-wrapper..."
-WRAPPER_SOURCE="$DOTFILES_DIR/tmux-wrapper"
-WRAPPER_TARGET="$HOME/.local/bin/tmux-wrapper"
-
-if [ ! -d "$HOME/.local/bin" ]; then
-    mkdir -p "$HOME/.local/bin"
-    echo -e "${YELLOW}  Created $HOME/.local/bin directory${NC}"
-fi
-
-if [ -L "$WRAPPER_TARGET" ] && [ "$(readlink "$WRAPPER_TARGET")" = "$WRAPPER_SOURCE" ]; then
-    echo -e "${GREEN}  ✓ tmux-wrapper already linked${NC}"
-elif [ -e "$WRAPPER_TARGET" ] && [ ! -L "$WRAPPER_TARGET" ]; then
-    backup_file ".local/bin/tmux-wrapper"
-    ln -s "$WRAPPER_SOURCE" "$WRAPPER_TARGET"
-    echo -e "${GREEN}  ✓ Linked tmux-wrapper${NC}"
-elif [ -L "$WRAPPER_TARGET" ]; then
-    rm "$WRAPPER_TARGET"
-    ln -s "$WRAPPER_SOURCE" "$WRAPPER_TARGET"
-    echo -e "${GREEN}  ✓ Linked tmux-wrapper${NC}"
-else
-    ln -s "$WRAPPER_SOURCE" "$WRAPPER_TARGET"
-    echo -e "${GREEN}  ✓ Linked tmux-wrapper${NC}"
-fi
-
 # Check for required dependencies
 echo ""
 echo "Checking dependencies..."
@@ -141,12 +115,10 @@ echo "Next steps:"
 echo "  1. Apply bash changes:"
 echo "     source ~/.bashrc"
 echo ""
-echo "  2. Ensure ~/.local/bin is in your PATH (already configured in .bashrc)"
-echo ""
-echo "  3. Apply tmux changes (if tmux is running):"
+echo "  2. Apply tmux changes (if tmux is running):"
 echo "     tmux source-file ~/.tmux.conf"
 echo ""
-echo "  4. View tmux cheatsheet anytime with:"
+echo "  3. View tmux cheatsheet anytime with:"
 echo "     Prefix ? (where Prefix is Ctrl+a)"
 echo ""
 

@@ -115,3 +115,33 @@ backup() {
 path() {
     echo "$PATH" | tr ':' '\n'
 }
+
+export PATH="$HOME/.local/go/bin:$HOME/go/bin:$PATH"
+
+# --- Restored from ~/.dotfiles-backup-20260626-205236 (installer dropped these) ---
+
+# Cargo / rustup
+. "$HOME/.cargo/env"
+
+# Force X11 backend to avoid Wayland freetype-rs crash
+export WINIT_UNIX_BACKEND=x11
+
+# PATH: prepend in reverse priority, then dedupe
+export PATH="$HOME/.opencode/bin:$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
+PATH=$(printf %s "$PATH" | awk -v RS=: -v ORS=: '!seen[$0]++' | sed 's/:$//')
+export PATH
+
+# Secrets (file is chmod 600; SIYUAN_TOKEN moved here out of this tracked file)
+[ -f "$HOME/.config/secrets.env" ] && . "$HOME/.config/secrets.env"
+
+# Auto-start oc-go-cc proxy once per WSL session
+if [ -z "$OC_GO_CC_STARTED" ] && command -v oc-go-cc >/dev/null 2>&1; then
+  if ! oc-go-cc status > /dev/null 2>&1; then
+    oc-go-cc serve -b
+  fi
+  export OC_GO_CC_STARTED=1
+fi
+
+# Alias: claude-go routes through OpenCode Go via oc-go-cc
+alias claude-go='ANTHROPIC_BASE_URL=http://127.0.0.1:3456 ANTHROPIC_AUTH_TOKEN=unused claude'
+export COLORTERM=truecolor

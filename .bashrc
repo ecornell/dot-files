@@ -145,3 +145,8 @@ fi
 # Alias: claude-go routes through OpenCode Go via oc-go-cc
 alias claude-go='ANTHROPIC_BASE_URL=http://127.0.0.1:3456 ANTHROPIC_AUTH_TOKEN=unused claude'
 export COLORTERM=truecolor
+
+# --- tool update notice (flag written weekly by cron; see `tool-update-check`) ---
+if [ -s "$HOME/.cache/tool-updates.flag" ]; then
+    cat "$HOME/.cache/tool-updates.flag"
+fi

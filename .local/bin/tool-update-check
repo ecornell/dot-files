@@ -1,0 +1,186 @@
+#!/usr/bin/env bash
+# tool-update-check -- report whether locally-installed dev tools are current
+# against their AUTHORITATIVE upstreams (GitHub releases API / self-managed),
+# not scraped/cached web pages.
+#
+# Table-driven: add a tool by adding one `check_tool` line at the bottom.
+#
+# Modes:
+#   tool-update-check           # full aligned table
+#   tool-update-check --quiet    # print nothing; exit code only
+#   tool-update-check --flag     # write ONLY out-of-date lines to the flag file
+#                                # (or delete it when all current) -- for cron+MOTD
+#
+# Exit codes: 0 all current/self-managed | 1 an update is available
+#             3 a check could not reach its upstream (offline / rate limit)
+set -uo pipefail   # NOTE: no `-e` -- a single tool's network failure must not
+                   # abort the whole sweep; each check reports its own status.
+
+FLAG_FILE="${TOOL_UPDATE_FLAG:-$HOME/.cache/tool-updates.flag}"
+MODE="table"
+case "${1:-}" in
+  --quiet|-q) MODE="quiet" ;;
+  --flag)     MODE="flag" ;;
+  "" )        MODE="table" ;;
+  *) echo "usage: tool-update-check [--quiet|--flag]" >&2; exit 2 ;;
+esac
+
+any_update=0
+any_error=0
+flag_lines=""   # accumulated "update available" lines for --flag mode
+
+# Optional GitHub auth: an unauthenticated caller gets 60 req/hr per IP, so a
+# hang or a burst can flap checks to "upstream unreachable". Use $GITHUB_TOKEN
+# or the gh CLI's token when available (raises the limit to 5000/hr). Absent, we
+# fall back to unauthenticated -- still fine at this cadence.
+GH_AUTH=()
+_gh_tok="${GITHUB_TOKEN:-}"
+[[ -z "$_gh_tok" ]] && command -v gh >/dev/null 2>&1 && _gh_tok="$(gh auth token 2>/dev/null || true)"
+[[ -n "$_gh_tok" ]] && GH_AUTH=(-H "Authorization: Bearer ${_gh_tok}")
+
+# curl with hard timeouts so a stalled endpoint can't hang login/cron refreshes.
+gh_curl() {
+  curl -fsSL --connect-timeout 5 --max-time 10 \
+    ${GH_AUTH[@]+"${GH_AUTH[@]}"} "$@" 2>/dev/null || true
+}
+
+# Fetch the latest release tag for a GitHub repo. Capture the whole body FIRST,
+# then parse -- piping curl straight into `grep -m1` makes curl die on SIGPIPE
+# under pipefail (see feedback_pipefail_sigpipe_grep_m1). Falls back to /tags for
+# repos that publish tags without formal releases; the /tags list is NOT sorted
+# newest-first, so pick the highest by `sort -V`. Prints bare version or "".
+gh_latest() {
+  local repo="$1" body tag
+  body="$(gh_curl "https://api.github.com/repos/${repo}/releases/latest")"
+  tag="$(printf '%s' "$body" | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name": *"v?([^"]+)".*/\1/' || true)"
+  if [[ -z "$tag" ]]; then
+    body="$(gh_curl "https://api.github.com/repos/${repo}/tags")"
+    tag="$(printf '%s' "$body" | grep '"name"' | sed -E 's/.*"name": *"v?([^"]+)".*/\1/' | sort -V | tail -1 || true)"
+  fi
+  printf '%s' "$tag"
+}
+
+emit() {  # emit <name> <status-symbol> <detail>
+  local name="$1" sym="$2" detail="$3"
+  [[ "$MODE" == "table" ]] && printf '  %-16s %s %s\n' "$name" "$sym" "$detail"
+}
+
+# check_tool <name> <installed-version> <github-repo> <upgrade-hint>
+check_tool() {
+  local name="$1" installed="$2" repo="$3" upgrade="$4" latest newest
+  if [[ -z "$installed" ]]; then
+    any_error=1; emit "$name" "?  " "not installed / version unreadable"; return
+  fi
+  installed="${installed#v}"   # normalize a leading 'v' (gh_latest already strips it upstream)
+  latest="$(gh_latest "$repo")"
+  if [[ -z "$latest" ]]; then
+    any_error=1; emit "$name" "?  " "v${installed} -- upstream unreachable (${repo})"; return
+  fi
+  if [[ "$installed" == "$latest" ]]; then
+    emit "$name" "OK " "v${installed} (current)"; return
+  fi
+  newest="$(printf '%s\n%s\n' "$installed" "$latest" | sort -V | tail -1)"
+  if [[ "$newest" == "$installed" ]]; then
+    emit "$name" "OK " "v${installed} ahead of release v${latest} (dev build)"; return
+  fi
+  any_update=1
+  emit "$name" "UP " "v${installed} -> v${latest}   [${upgrade}]"
+  flag_lines+="  $name: v${installed} -> v${latest}   (${upgrade})"$'\n'
+}
+
+# check_self <name> <installed-version> <note>  -- self-updating tools we don't
+# poll (no false "behind" from an endpoint we'd have to guess at).
+check_self() {
+  local name="$1" installed="$2" note="$3"
+  [[ -z "$installed" ]] && { any_error=1; emit "$name" "?  " "version unreadable"; return; }
+  emit "$name" "-- " "v${installed} (${note})"
+}
+
+# check_rustup -- authoritative toolchain currency via `rustup check` (hits
+# static.rust-lang.org, NOT the GitHub API, so it costs nothing against the
+# 60/hr limit). One row per toolchain; any "update available" -> `rustup update`.
+check_rustup() {
+  command -v rustup >/dev/null 2>&1 || return
+  local out line short ver label
+  # `rustup check` exits 100 when updates are available (0 when current), so a
+  # non-zero status is NOT a failure -- the report is on stdout either way.
+  # Treat only empty output (offline / timeout kill) as an error.
+  out="$(timeout 15 rustup check 2>/dev/null)"
+  if [[ -z "$out" ]]; then
+    any_error=1; emit "rustup" "?  " "rustup check failed (offline?)"; return
+  fi
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    short="${line%% *}"                                 # "stable-x86_64-..." or "rustup"
+    if [[ "$short" == rustup ]]; then label="rustup"; else label="rustup:${short%%-*}"; fi
+    if [[ "$line" == *"update available"* ]]; then
+      ver="${line#*update available: }"                 # "1.96.0 (..) -> 1.97.0 (..)"
+      ver="$(printf '%s' "$ver" | sed -E 's/ *\([^)]*\)//g')"   # drop commit/date noise
+      any_update=1
+      emit "$label" "UP " "${ver}   [rustup update]"
+      flag_lines+="  ${label}: ${ver}   (rustup update)"$'\n'
+    else
+      ver="${line#*: }"; ver="$(printf '%s' "$ver" | sed -E 's/ *\([^)]*\)//g')"
+      emit "$label" "OK " "${ver} (current)"
+    fi
+  done <<< "$out"
+}
+
+# check_git_drift <label> <repo-dir> -- surface a repo's local drift (uncommitted
+# + unpushed) so work-in-progress doesn't get forgotten. Deliberately does NO
+# network fetch: a login/cron shell must never block on an SSH passphrase, so
+# "behind origin" is out of scope -- this is about YOUR un-saved/un-pushed work.
+check_git_drift() {
+  local label="$1" dir="$2" dirty unpushed msg bits=()
+  command -v git >/dev/null 2>&1 || return
+  git -C "$dir" rev-parse --git-dir >/dev/null 2>&1 || return
+  dirty="$(git -C "$dir" status --porcelain 2>/dev/null | grep -c . || true)"
+  unpushed="$(git -C "$dir" rev-list --count '@{upstream}..HEAD' 2>/dev/null || echo 0)"
+  [[ "$dirty"    -gt 0 ]] && bits+=("${dirty} uncommitted")
+  [[ "$unpushed" -gt 0 ]] && bits+=("${unpushed} unpushed")
+  if [[ ${#bits[@]} -eq 0 ]]; then
+    emit "$label" "OK " "clean & pushed"; return
+  fi
+  if [[ ${#bits[@]} -eq 2 ]]; then msg="${bits[0]}, ${bits[1]}"; else msg="${bits[0]}"; fi
+  any_update=1
+  emit "$label" "UP " "${msg}   [cd ${dir/#$HOME/\~} && git status]"
+  flag_lines+="  ${label}: ${msg}   (${dir/#$HOME/\~})"$'\n'
+}
+
+# --- version extractors (formats differ per tool) ----------------------------
+v_rtk="$(rtk --version 2>/dev/null | awk '{print $2}')"
+v_uv="$(uv --version 2>/dev/null | awk '{print $2}')"
+v_rdm="$(rust-docs-mcp --version 2>/dev/null | awk '{print $2}')"
+v_claude="$(claude --version 2>/dev/null | awk '{print $1}')"
+
+[[ "$MODE" == "table" ]] && echo "Tool update check (authoritative upstreams):"
+
+check_tool "rtk"           "$v_rtk"    "rtk-ai/rtk"          "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/master/install.sh | sh"
+check_tool "uv"            "$v_uv"     "astral-sh/uv"        "uv self update"
+# rust-docs-mcp builds from main -- no tagged releases -- so poll nothing; it
+# ships its own `update`. claude auto-updates. Both are self-managed.
+check_self "rust-docs-mcp" "$v_rdm"    "no tagged releases; 'rust-docs-mcp update' to refresh"
+check_self "claude"        "$v_claude" "auto-updates; 'claude update' to force"
+check_rustup   # Rust toolchains (stable/nightly) -- authoritative, no API cost
+
+# Local repos whose drift (uncommitted / unpushed) should surface in the MOTD.
+# Colon-separated; override with $TOOL_UPDATE_DRIFT_REPOS.
+IFS=':' read -r -a _drift_repos <<< "${TOOL_UPDATE_DRIFT_REPOS:-$HOME/.dot-files}"
+for _r in "${_drift_repos[@]}"; do
+  [[ -z "$_r" ]] && continue
+  _lbl="$(basename "$_r")"; check_git_drift "${_lbl#.}" "$_r"
+done
+
+# --- flag-file maintenance (cron + shell-MOTD pattern) -----------------------
+if [[ "$MODE" == "flag" ]]; then
+  if [[ -n "$flag_lines" ]]; then
+    mkdir -p "$(dirname "$FLAG_FILE")"
+    { printf 'Attention needed (run tool-update-check):\n'; printf '%s' "$flag_lines"; } > "$FLAG_FILE"
+  else
+    rm -f "$FLAG_FILE"
+  fi
+fi
+
+if   [[ "$any_update" -eq 1 ]]; then exit 1
+elif [[ "$any_error"  -eq 1 ]]; then exit 3
+else exit 0; fi

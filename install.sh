@@ -27,6 +27,7 @@ DOTFILES=(
 # Additional files to symlink to home directory
 SUPPORT_FILES=(
     "tmux-cheatsheet.md"
+    ".local/bin/tool-update-check"
 )
 
 # Create backup directory if we need it
@@ -41,6 +42,7 @@ create_backup_dir() {
 backup_file() {
     local file=$1
     create_backup_dir
+    mkdir -p "$(dirname "$BACKUP_DIR/$file")"
     mv "$HOME/$file" "$BACKUP_DIR/$file"
     echo -e "${YELLOW}  Backed up existing $file to $BACKUP_DIR${NC}"
 }
@@ -74,7 +76,8 @@ create_symlink() {
         echo -e "${YELLOW}  Removed old symlink for $file${NC}"
     fi
 
-    # Create the symlink
+    # Create the symlink (ensure parent dir exists for nested targets)
+    mkdir -p "$(dirname "$target")"
     ln -s "$source" "$target"
     echo -e "${GREEN}  ✓ Linked $file${NC}"
 }

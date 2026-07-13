@@ -146,7 +146,18 @@ fi
 alias claude-go='ANTHROPIC_BASE_URL=http://127.0.0.1:3456 ANTHROPIC_AUTH_TOKEN=unused claude'
 export COLORTERM=truecolor
 
-# --- tool update notice (flag written weekly by cron; see `tool-update-check`) ---
+# --- tool update notice (flag refreshed daily by cron + in background on login) ---
 if [ -s "$HOME/.cache/tool-updates.flag" ]; then
     cat "$HOME/.cache/tool-updates.flag"
+fi
+# Refresh the flag in the background so the MOTD stays current without adding
+# network latency to shell startup. Throttled to once every 6h via a stamp file
+# (touched first, so a burst of new terminals only triggers one check).
+if command -v tool-update-check >/dev/null 2>&1; then
+    _tuc_stamp="$HOME/.cache/tool-updates.checked"
+    if [ ! -e "$_tuc_stamp" ] || [ -n "$(find "$_tuc_stamp" -mmin +360 2>/dev/null)" ]; then
+        ( touch "$_tuc_stamp"; tool-update-check --flag >/dev/null 2>&1 ) &
+        disown 2>/dev/null || true
+    fi
+    unset _tuc_stamp
 fi

@@ -123,8 +123,10 @@ export PATH="$HOME/.local/go/bin:$HOME/go/bin:$PATH"
 # Cargo / rustup
 . "$HOME/.cargo/env"
 
-# Force X11 backend to avoid Wayland freetype-rs crash
-export WINIT_UNIX_BACKEND=x11
+# No WINIT_UNIX_BACKEND here on purpose: winit 0.29 REMOVED it in favour of the
+# standard WAYLAND_DISPLAY / DISPLAY variables, so setting it does nothing. To
+# actually force X11 for a winit app, unset WAYLAND_DISPLAY for it -- Wayland
+# wins whenever both are set.
 
 # PATH: prepend in reverse priority, then dedupe
 export PATH="$HOME/.opencode/bin:$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"

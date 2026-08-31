@@ -148,6 +148,10 @@ fi
 alias claude-go='ANTHROPIC_BASE_URL=http://127.0.0.1:3456 ANTHROPIC_AUTH_TOKEN=unused claude'
 export COLORTERM=truecolor
 
+# Persistent local ranking databases for the FFF Pi extension.
+export FFF_FRECENCY_DB="$HOME/.pi/agent/fff/frecency.db"
+export FFF_HISTORY_DB="$HOME/.pi/agent/fff/history.db"
+
 # --- tool update notice (flag refreshed daily by cron + in background on login) ---
 if [ -s "$HOME/.cache/tool-updates.flag" ]; then
     cat "$HOME/.cache/tool-updates.flag"
@@ -163,3 +167,8 @@ if command -v tool-update-check >/dev/null 2>&1; then
     fi
     unset _tuc_stamp
 fi
+
+# .NET SDK (user-local install via dotnet-install.sh)
+export DOTNET_ROOT="$HOME/.dotnet"
+export PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$PATH"
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
